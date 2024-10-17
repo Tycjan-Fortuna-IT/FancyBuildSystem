@@ -76,7 +76,7 @@ function FBS.IncludeDependencies(config)
 
     for key, libraryData in pairs(FBS.Dependencies) do
 
-        if config == nil or libraryData.Configurations == nil or string.find(libraryData.Configurations, config) then
+        if config == nil or libraryData.Configurations == nil or FBS.IsInConfigurationGroup(config) then
             -- Process target scope
             if libraryData[target] ~= nil then
                 AddDependencyIncludes(libraryData[target])
@@ -95,7 +95,7 @@ function FBS.IncludeDefines(config)
 
     for key, libraryData in pairs(FBS.Dependencies) do
 
-        if config == nil or libraryData.Configurations == nil or string.find(libraryData.Configurations, config) then
+        if config == nil or libraryData.Configurations == nil or FBS.IsInConfigurationGroup(config) then
             -- Process target scope
             if libraryData[target] ~= nil then
                 AddDependencyDefines(libraryData[target])
@@ -114,7 +114,7 @@ function FBS.LinkDependencies(config)
 
     for key, libraryData in pairs(FBS.Dependencies) do
 
-        if config == nil or libraryData.Configurations == nil or string.find(libraryData.Configurations, config) then
+        if config == nil or libraryData.Configurations == nil or FBS.IsInConfigurationGroup(config) then
             local continueLink = true
 
             -- Process target scope
