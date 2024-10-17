@@ -165,3 +165,18 @@ FBS.ProcessDependencies(FBS.Configurations.Debug)
 ```
 
 This will include defines, link libraries, and include directories specified for the **Debug** configuration in your `FBS.Dependencies`.
+
+### Tracy Example
+```lua
+{
+    Name = "Tracy",
+    IncludeDir = "%{wks.location}/Engine/vendor/tracy/tracy/public",
+    LibsToLink = { "Tracy" },
+    Windows = {
+        LibsToLink = { "ws2_32", "Dbghelp" },
+    },
+    Linux = {
+        LibsToLink = { "pthread" },
+    },
+},
+```

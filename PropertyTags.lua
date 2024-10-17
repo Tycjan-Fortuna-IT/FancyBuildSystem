@@ -7,7 +7,7 @@ local dotnetbase = premake.vstudio.dotnetbase
 -- Note that I did not know how to specify a list of paired values... this will become apparent down the line, so for now please
 -- accept a list of strings...
 premake.api.register {
-    name = "propertytags",
+    name = "property_tags",
     scope = "project",
     kind = "list:string",
 }

@@ -115,17 +115,13 @@ function FBS.LinkDependencies(config)
     for key, libraryData in pairs(FBS.Dependencies) do
 
         if config == nil or libraryData.Configurations == nil or FBS.IsInConfigurationGroup(config) then
-            local continueLink = true
-
             -- Process target scope
             if libraryData[target] ~= nil then
-                continueLink = not LinkDependency(libraryData[target])
+                LinkDependency(libraryData[target])
             end
 
-            if continueLink then
-                -- Process global scope
-                LinkDependency(libraryData)
-            end
+            -- Process global scope
+            LinkDependency(libraryData)
         end
 
     end
