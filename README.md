@@ -180,3 +180,26 @@ This will include defines, link libraries, and include directories specified for
     },
 },
 ```
+
+## Modules
+Modules allow you to group dependencies together, making it easier to manage and organize dependencies related to specific features or subsystems. To use a module, simply add the following line to your dependencies table:
+```lua
+FBS.ImportModule("Engine/modules/Logger");
+```
+
+In the module's `Module.lua` file, define the module as follows:
+
+```lua
+return function(basePath)
+    return {
+        Name = "SW Logger Module",
+        LibsToLink = { "Logger" },
+        IncludeDirs = {
+            basePath .. "/src",
+            basePath .. "/vendor/spdlog/include"
+        },
+    }
+end
+```
+
+All paths are relative to the project root. This setup ensures that all features are supported and dependencies are correctly managed.

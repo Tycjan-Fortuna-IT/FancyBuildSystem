@@ -133,3 +133,9 @@ function FBS.ProcessDependencies(config)
     FBS.IncludeDefines(config)
     FBS.LinkDependencies(config)
 end
+
+function FBS.ImportModule(modulePath)
+    local module = include(modulePath .. "/Module.lua")("%{wks.location}/" .. modulePath)
+
+    return module;
+end
