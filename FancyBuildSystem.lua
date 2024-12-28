@@ -1,6 +1,8 @@
 include "SolutionItems.lua"
 include "PropertyTags.lua"
 
+require "ninja/ninja"
+
 FBS = {
     Configurations = {},
     Dependencies = {},
