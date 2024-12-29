@@ -42,7 +42,11 @@ end
 
 function AddDependencyIncludes(table)
 	if table.IncludeDirs ~= nil then
-		externalincludedirs { table.IncludeDirs }
+		includedirs { table.IncludeDirs }
+	end
+
+	if table.ExternalIncludeDirs ~= nil then
+		externalincludedirs { table.ExternalIncludeDirs }
 	end
 end
 
