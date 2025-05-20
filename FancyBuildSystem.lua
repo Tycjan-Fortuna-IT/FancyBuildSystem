@@ -43,11 +43,7 @@ end
 
 function AddDependencyIncludes(table)
 	if table.IncludeDirs ~= nil then
-		includedirs { table.IncludeDirs }
-	end
-
-	if table.ExternalIncludeDirs ~= nil then
-		externalincludedirs { table.ExternalIncludeDirs }
+		externalincludedirs { table.IncludeDirs }
 	end
 end
 
@@ -78,10 +74,10 @@ function LinkDependency(table)
 end
 
 -- Include the dependencies for the given configuration
-function FBS.IncludeDependencies(config)
+function FBS.IncludeDependencies(deps, config)
     local target = FBS.FirstToUpper(os.target())
 
-    for key, libraryData in pairs(FBS.Dependencies) do
+    for key, libraryData in pairs(deps) do
 
         if config == nil or libraryData.Configurations == nil or FBS.IsInConfigurationGroup(config) then
             -- Process target scope
@@ -97,10 +93,10 @@ function FBS.IncludeDependencies(config)
 end
 
 -- Include the defines for the given configuration
-function FBS.IncludeDefines(config)
+function FBS.IncludeDefines(deps, config)
     local target = FBS.FirstToUpper(os.target())
 
-    for key, libraryData in pairs(FBS.Dependencies) do
+    for key, libraryData in pairs(deps) do
 
         if config == nil or libraryData.Configurations == nil or FBS.IsInConfigurationGroup(config) then
             -- Process target scope
@@ -116,10 +112,10 @@ function FBS.IncludeDefines(config)
 end
 
 -- Link the dependencies for the given configuration
-function FBS.LinkDependencies(config)
+function FBS.LinkDependencies(deps, config)
     local target = FBS.FirstToUpper(os.target())
 
-    for key, libraryData in pairs(FBS.Dependencies) do
+    for key, libraryData in pairs(deps) do
 
         if config == nil or libraryData.Configurations == nil or FBS.IsInConfigurationGroup(config) then
             -- Process target scope
@@ -136,13 +132,23 @@ end
 
 -- Process the dependencies for the given configuration
 function FBS.ProcessDependencies(config)
-    FBS.IncludeDependencies(config)
-    FBS.IncludeDefines(config)
-    FBS.LinkDependencies(config)
+    FBS.IncludeDependencies(FBS.Dependencies, config)
+    FBS.IncludeDefines(FBS.Dependencies, config)
+    FBS.LinkDependencies(FBS.Dependencies, config)
+end
+
+-- Process the local dependencies for the given configuration
+-- Instead of a gloal dependencies table, this function uses the local dependencies table
+function FBS.ProcessLocalDependencies(deps, config)
+    FBS.IncludeDependencies(deps, config)
+    FBS.IncludeDefines(deps, config)
+    FBS.LinkDependencies(deps, config)
 end
 
 function FBS.ImportModule(modulePath)
-    local module = include(modulePath .. "/Module.lua")("%{wks.location}/" .. modulePath)
+    local module = include(modulePath .. "/Module.lua")(modulePath)
+    
+    print("Importing module: " .. module.Name)
 
     return module;
 end
