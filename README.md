@@ -147,14 +147,52 @@ FBS.Dependencies = {
 }
 ```
 
+### Using local dependencies
+
+You can also define dependencies in a local scope, which allows you to create reusable dependency definitions that can be included in multiple projects or modules. This is useful for managing complex projects with many dependencies.
+
+It typically could include a `Dependencies.lua` file that returns all dependencies for that module. For example:
+
+```lua
+deps = {
+    FBS.ImportModule("/SW.Engine/modules/SW.Common"),
+    {
+        Name = "GLFW",
+        Defines = { "GLFW_INCLUDE_NONE" },
+        IncludeDirs = { "%{wks.location}/Engine/vendor/glfw/include" },
+        LibsToLink = { "GLFW" },
+    },
+    {
+        Name = "spdlog",
+        IncludeDirs = { "%{wks.location}/Engine/vendor/spdlog/include" },
+    },
+    {
+        Name = "nvrhi",
+        IncludeDirs = { "%{wks.location}/Engine/vendor/nvrhi/nvrhi/include" },
+        LibsToLink = { "NVRHI" },
+    }
+}
+
+return deps
+```
+
 ## Using FancyBuildSystem in Your Project
 
 Once your dependencies are defined, you can include them in your project with the following methods:
 
-- `FBS.IncludeDependencies` - Includes dependencies for the current configuration
+<!-- - `FBS.IncludeDependencies` - Includes dependencies for the current configuration
 - `FBS.IncludeDefines` - Adds the defined preprocessor definitions for the current configuration
 - `FBS.LinkDependencies` - Links the required libraries for the current configuration
-- Or use the convenience method `FBS.IncludeAllDependencies` to perform all of the above in one step.
+- Or use the convenience method `FBS.IncludeAllDependencies` to perform all of the above in one step. -->
+
+- `FBS.IncludeDependencies(deps, config)` - Includes dependencies for the specified configuration.
+- `FBS.IncludeDefines(deps, config)` - Adds the defined preprocessor definitions for the specified configuration.
+- `FBS.LinkDependencies(deps, config)` - Links the required libraries for the specified configuration.
+- `FBS.IncludeAllDependencies(deps, config)` - Convenience method to perform all of the above in one step.
+
+`deps` is the table containing your dependencies defaulting to `FBS.Dependencies`, but for the case of local dependencies, you can pass the local dependencies table.
+
+`config` is the configuration you want to process, such as `FBS.Configurations.Debug`.
 
 ### Example Usage in a Premake Project File
 
@@ -167,10 +205,11 @@ FBS.ProcessDependencies(FBS.Configurations.Debug)
 This will include defines, link libraries, and include directories specified for the **Debug** configuration in your `FBS.Dependencies`.
 
 ### Tracy Example
+
 ```lua
 {
     Name = "Tracy",
-    IncludeDir = "%{wks.location}/Engine/vendor/tracy/tracy/public",
+    IncludeDirs = { "%{wks.location}/Engine/vendor/tracy/tracy/public" },
     LibsToLink = { "Tracy" },
     Windows = {
         LibsToLink = { "ws2_32", "Dbghelp" },
@@ -182,7 +221,9 @@ This will include defines, link libraries, and include directories specified for
 ```
 
 ## Modules
+
 Modules allow you to group dependencies together, making it easier to manage and organize dependencies related to specific features or subsystems. To use a module, simply add the following line to your dependencies table:
+
 ```lua
 FBS.ImportModule("Engine/modules/Logger");
 ```
@@ -202,4 +243,30 @@ return function(basePath)
 end
 ```
 
-All paths are relative to the project root. This setup ensures that all features are supported and dependencies are correctly managed.
+All paths are relative to the `os.getcwd()` directory by default, but it can be changed by overwriting the `FBS.WorkspaceDirectory`.
+
+`Transitive dependencies are not implicitly included in the module.` Therefore, you need to explicitly include any dependencies that the module requires. This allows for better control over what dependencies are included in your project.
+
+You can use the `FBS.MergeDependencies` function to combine dependencies from multiple modules or scopes. This is useful when a module depends on another module, and you want to ensure all dependencies are included.
+
+```lua
+return function(importPath)
+    return FBS.MergeDependencies(
+        {
+            Name = "SW.Engine",
+            LibsToLink = { "SW.Engine" },
+            IncludeDirs = {
+                importPath .. "/src",
+            },
+        }, {
+            FBS.ImportModule(FBS.WorkspaceDirectory .. "/SW.Engine/modules/SW.Common"),
+            {
+                Name = "GLFW",
+                Defines = { "GLFW_INCLUDE_NONE" },
+                IncludeDirs = { "%{wks.location}/Engine/vendor/glfw/include" },
+                LibsToLink = { "GLFW" },
+            },
+        }
+    )
+end
+```
