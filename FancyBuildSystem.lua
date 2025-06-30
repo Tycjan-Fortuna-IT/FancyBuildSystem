@@ -1,5 +1,4 @@
 include "SolutionItems.lua"
-include "PropertyTags.lua"
 
 require "ninja/ninja"
 require "compilation-database/export-compile-commands"
